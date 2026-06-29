@@ -1,0 +1,10 @@
+# Foldery budowania CMake (tu są ciężkie pliki binarne)
+cmake-build-*/
+build/
+out/
+
+# Konfiguracja środowiska CLion / IntelliJ
+.idea/
+
+# Pliki systemowe macOS
+.DS_Store
