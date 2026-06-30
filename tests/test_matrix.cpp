@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 #include <stdexcept>
+
+#include "Activation.h"
 #include "Matrix.h"
 
 TEST(MatrixTest, Initialization) {
@@ -13,6 +15,16 @@ TEST(MatrixTest, Initialization) {
     EXPECT_EQ(m.getNumCols(), 2);
     EXPECT_DOUBLE_EQ(m(0, 0), 0.0);
     EXPECT_DOUBLE_EQ(m(2, 1), 0.0);
+}
+
+TEST(MatrixTest, getNumRowsColsDataTest) {
+    Matrix m(3, 2);
+    EXPECT_EQ(m.getNumRows(), 3);
+    EXPECT_EQ(m.getNumCols(), 2);
+
+    std::vector<double> vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    EXPECT_EQ(m.getData(), vec);
 }
 
 TEST(MatrixTest, ElementAccess) {
@@ -112,4 +124,28 @@ TEST(MatrixTest, ThrowsOnInvalidDimensions) {
     EXPECT_THROW(m1 - m2, std::invalid_argument);
     EXPECT_THROW(m1 * m2, std::invalid_argument); // Mnożenie 2x3 przez 4x5 jest nielegalne
     EXPECT_THROW(m1.hadamard(m2), std::invalid_argument);
+}
+
+TEST(MatrixTest, MapFunctionSigmoid) {
+    Matrix m(2, 2);
+    m(0, 0) = 0.0; m(0, 1) = 1000.;
+    m(1, 0) = -1000.; m(1, 1) = 0.0;
+
+    Matrix expected(2, 2);
+    expected(0, 0) = 0.5; expected(0, 1) = 1.;
+    expected(1, 0) = 0.; expected(1, 1) = 0.5;
+
+    EXPECT_EQ(m.map(Activations::sigmoid), expected);
+}
+
+TEST(MatrixTest, MapFunctionRelu) {
+    Matrix m(2, 2);
+    m(0, 0) = 0.0; m(0, 1) = 1000.;
+    m(1, 0) = -1000.; m(1, 1) = 0.0;
+
+    Matrix expected(2, 2);
+    expected(0, 0) = 0.0; expected(0, 1) = 1000.0;
+    expected(1, 0) = 0.0; expected(1, 1) = 0.0;
+
+    EXPECT_EQ(m.map(Activations::relu), expected);
 }

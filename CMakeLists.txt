@@ -13,10 +13,12 @@ add_library(nn_core src/Matrix.cpp src/Layer.cpp
         src/Matrix.cpp
         include/Matrix.h
         src/Layer.cpp
-        include/Layer.h)
+        include/Layer.h
+        include/Activation.h)
 
 # Plik wykonywalny
-add_executable(nn_app src/main.cpp)
+add_executable(nn_app src/main.cpp
+        include/Activation.h)
 target_link_libraries(nn_app nn_core)
 
 # Dołącz folder z testami

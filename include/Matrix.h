@@ -5,6 +5,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 #include <vector>
+#include <functional>
 
 class Matrix {
     private:
@@ -21,6 +22,7 @@ class Matrix {
     //Getters
     int getNumRows() const;
     int getNumCols() const;
+    const std::vector<double>& getData() const;
 
     //Helper method
     void print() const;
@@ -37,6 +39,7 @@ class Matrix {
 
     Matrix transpose() const;
     Matrix hadamard(const Matrix& other) const;
+    Matrix map(const std::function<double(double)>& func) const;
 
     bool operator==(const Matrix& other) const;
 };

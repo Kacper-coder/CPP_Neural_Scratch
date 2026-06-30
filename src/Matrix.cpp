@@ -18,6 +18,10 @@ int Matrix::getNumRows() const {
      return rows;
  }
 
+const std::vector<double>& Matrix::getData() const {
+    return this->data;
+}
+
 double& Matrix::operator()(int r, int c) {
      return data[r * cols + c];
  }
@@ -117,6 +121,16 @@ Matrix Matrix::hadamard(const Matrix& other) const {
         result.data[i] = this->data[i] * other.data[i];
     }
 
+    return result;
+}
+
+Matrix Matrix::map(const std::function<double(double)>& func) const {
+
+    Matrix result(this->rows, this->cols);
+
+    for (int i = 0; i < this->rows * this->cols; i++) {
+        result.data[i] = func(this->data[i]);
+    }
     return result;
 }
 

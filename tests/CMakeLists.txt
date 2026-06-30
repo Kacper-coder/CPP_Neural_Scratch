@@ -8,7 +8,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # Skompiluj testy
-add_executable(nn_tests test_matrix.cpp)
+add_executable(nn_tests test_matrix.cpp
+        ../include/Activation.h
+        test_activations.cpp)
 
 # Połącz testy z GTest oraz Twoją biblioteką nn_core
 target_link_libraries(nn_tests gtest_main nn_core)
