@@ -28,11 +28,17 @@ class Matrix {
     //neccesary operator overloads
     double& operator()(int r, int c);
     const double& operator()(int r, int c) const;
+    Matrix& operator+=(const Matrix& other);
+    Matrix& operator-=(const Matrix& other);
     Matrix operator+(const Matrix& other) const;
     Matrix operator-(const Matrix& other) const;
     Matrix operator*(const Matrix& other) const;
     Matrix operator*(double scalar) const;
 
+    Matrix transpose() const;
+    Matrix hadamard(const Matrix& other) const;
+
+    bool operator==(const Matrix& other) const;
 };
 
 #endif //MATRIX_H

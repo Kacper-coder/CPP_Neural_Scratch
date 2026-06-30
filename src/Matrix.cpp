@@ -26,31 +26,45 @@ const double& Matrix::operator()(int r, int c) const {
      return data[r * cols + c];
  }
 
+Matrix& Matrix::operator+=(const Matrix& other) {
+    if (this->rows != other.rows || this->cols != other.cols) {
+        throw std::invalid_argument("Blad! Macierze musza miec identyczne wymiary do +=.");
+    }
+
+    for (int i = 0; i < this->rows*this->cols; i++) {
+        this->data[i] += other.data[i];
+    }
+    return *this;
+}
+
+Matrix& Matrix::operator-=(const Matrix& other) {
+    if (this->rows != other.rows || this->cols != other.cols) {
+        throw std::invalid_argument("Blad! Macierze musza miec identyczne wymiary do -=.");
+    }
+
+    for (int i = 0; i < this->rows*this->cols; i++) {
+        this->data[i] -= other.data[i];
+    }
+    return *this;
+}
+
 Matrix Matrix::operator+(const Matrix& other) const {
-     if (this->cols != other.rows) {
-         throw std::invalid_argument("Blad! Liczba kolumn 1. macierzy musi byc rowna liczbie wierszy 2. macierzy.");
-     }
+    if (this->rows != other.rows || this->cols != other.cols) {
+        throw std::invalid_argument("Blad! Macierze musza miec identyczne wymiary do +.");
+    }
 
      Matrix result(*this);
-     for (int i = 0; i < getNumRows(); i++) {
-         for (int j = 0; j < getNumCols(); j++) {
-             result(i, j) += other(i, j);
-         }
-     }
+     result += other;
     return result;
  }
 
 Matrix Matrix::operator-(const Matrix& other) const {
-     if (this->cols != other.rows) {
-         throw std::invalid_argument("Blad! Liczba kolumn 1. macierzy musi byc rowna liczbie wierszy 2. macierzy.");
-     }
+    if (this->rows != other.rows || this->cols != other.cols) {
+        throw std::invalid_argument("Blad! Macierze musza miec identyczne wymiary do -.");
+    }
 
      Matrix result(*this);
-     for (int i = 0; i < getNumRows(); i++) {
-         for (int j = 0; j < getNumCols(); j++) {
-             result(i, j) -= other(i, j);
-         }
-     }
+     result -= other;
     return result;
  }
 
@@ -58,12 +72,12 @@ Matrix Matrix::operator*(const Matrix &other) const {
      if (this->cols != other.rows) {
          throw std::invalid_argument("Blad! Liczba kolumn 1. macierzy musi byc rowna liczbie wierszy 2. macierzy.");
      }
-     Matrix result(this->rows, other.getNumRows());
+     Matrix result(this->rows, other.getNumCols());
 
-    for (int i = 0; i < this->getNumRows(); i++) {
+    for (int i = 0; i < this->rows; i++) {
         for (int j = 0; j < other.getNumCols(); j++) {
             double sum = 0.0;
-            for (int k = 0; k < this->getNumCols(); k++) {
+            for (int k = 0; k < this->cols; k++) {
                 sum += (*this)(i, k) * other(k, j);
             }
             result(i, j) = sum;
@@ -73,18 +87,57 @@ Matrix Matrix::operator*(const Matrix &other) const {
 }
 
 Matrix Matrix::operator*(double scalar) const {
-    Matrix result(this->getNumRows(), this->getNumCols());
+    Matrix result(this->rows, this->cols);
 
-     for (int i = 0; i < this->getNumRows() * this->getNumCols(); i++) {
+     for (int i = 0; i < this->rows * this->cols; i++) {
          result.data[i] = this->data[i] * scalar;
      }
      return result;
 }
 
+
+Matrix Matrix::transpose() const {
+
+    Matrix result(this->cols, this->rows);
+
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            result(j,i) = (*this)(i, j);
+        }
+    }
+    return result;
+}
+
+Matrix Matrix::hadamard(const Matrix& other) const {
+    if (this->rows != other.rows || this->cols != other.cols) {
+        throw std::invalid_argument("Blad! Macierze musza miec identyczne wymiary do hadamard.");
+    }
+    Matrix result(this->rows, this->cols);
+    for (int i = 0; i < this->rows * this->cols; i++) {
+        result.data[i] = this->data[i] * other.data[i];
+    }
+
+    return result;
+}
+
+bool Matrix::operator==(const Matrix &other) const {
+    if (this->rows != other.rows || this->cols != other.cols) {
+        return false;
+    }
+
+    for (int i = 0; i < this->rows*this->cols; i++) {
+        if (std::abs(this->data[i] - other.data[i]) > 1e-9) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
 void Matrix::print() const {
-    for (int i = 0; i < this->getNumRows(); i++) {
-        for (int j = 0; j < this->getNumCols(); j++) {
-            std::cout << this->data[i * this->getNumCols() + j] << " ";
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            std::cout << this->data[i * this->cols + j] << " ";
         }
         std::cout << "\n";
     }

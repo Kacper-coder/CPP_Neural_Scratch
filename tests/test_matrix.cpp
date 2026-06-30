@@ -3,27 +3,20 @@
 //
 
 #include <gtest/gtest.h>
+#include <stdexcept>
 #include "Matrix.h"
 
-// Test 1: Sprawdzenie inicjalizacji i wymiarów
-// Makro TEST przyjmuje dwa argumenty: (NazwaGrupyTestow, NazwaKonkretnegoTestu)
 TEST(MatrixTest, Initialization) {
     Matrix m(3, 2);
 
-    // Oczekujemy, że wymiary to 3 i 2
     EXPECT_EQ(m.getNumRows(), 3);
     EXPECT_EQ(m.getNumCols(), 2);
-
-    // Oczekujemy, że nowa macierz jest wypełniona zerami.
-    // Używamy EXPECT_DOUBLE_EQ zamiast EXPECT_EQ, ponieważ dla liczb ułamkowych (double)
-    // mogą wystąpić minimalne błędy zaokrągleń na poziomie procesora.
     EXPECT_DOUBLE_EQ(m(0, 0), 0.0);
     EXPECT_DOUBLE_EQ(m(2, 1), 0.0);
 }
 
 TEST(MatrixTest, ElementAccess) {
     Matrix m(2, 2);
-
     m(0, 0) = 1.5;
     m(0, 1) = 2.9;
 
@@ -33,63 +26,90 @@ TEST(MatrixTest, ElementAccess) {
 
 TEST(MatrixTest, Addition) {
     Matrix m(2, 2);
-    m(0, 0) = 1.5;
-    m(0, 1) = 2.9;
-    m(1, 0) = 1.5;
-    m(1, 1) = 2.9;
-    Matrix m2 = m + m;
+    m(0, 0) = 1.5; m(0, 1) = 2.9;
+    m(1, 0) = 1.5; m(1, 1) = 2.9;
 
-    EXPECT_DOUBLE_EQ(m2(0, 0), 3.0);
-    EXPECT_DOUBLE_EQ(m2(0, 1), 5.8);
-    EXPECT_DOUBLE_EQ(m2(1, 0), 3.0);
-    EXPECT_DOUBLE_EQ(m2(1, 1), 5.8);
+    Matrix expected(2, 2);
+    expected(0, 0) = 3.0; expected(0, 1) = 5.8;
+    expected(1, 0) = 3.0; expected(1, 1) = 5.8;
+
+    EXPECT_EQ(m + m, expected);
 }
+
 TEST(MatrixTest, Subtraction) {
     Matrix m(2, 2);
-    m(0, 0) = 1.5;
-    m(0, 1) = 2.9;
-    m(1, 0) = 1.5;
-    m(1, 1) = 2.9;
-    Matrix m2 = m - m;
+    m(0, 0) = 1.5; m(0, 1) = 2.9;
+    m(1, 0) = 1.5; m(1, 1) = 2.9;
 
-    EXPECT_DOUBLE_EQ(m2(0, 0), 0.0);
-    EXPECT_DOUBLE_EQ(m2(0, 1), 0.0);
-    EXPECT_DOUBLE_EQ(m2(1, 0), 0.0);
-    EXPECT_DOUBLE_EQ(m2(1, 1), 0.0);
+    Matrix expected(2, 2);
+    // Domyślnie nowa macierz jest wypełniona zerami, więc nie musimy jej ręcznie ustawiać na 0.0!
+
+    EXPECT_EQ(m - m, expected);
 }
 
 TEST(MatrixTest, Multiplication) {
     Matrix m1(2, 2);
-    m1(0, 0) = 1.0;
-    m1(0, 1) = 2.0;
-    m1(1, 0) = 3.0;
-    m1(1, 1) = 4.0;
+    m1(0, 0) = 1.0; m1(0, 1) = 2.0;
+    m1(1, 0) = 3.0; m1(1, 1) = 4.0;
 
-    Matrix m2(2,2);
-    m2(0, 0) = 4.0;
-    m2(0, 1) = 3.0;
-    m2(1, 0) = 2.0;
-    m2(1, 1) = 1.0;
+    Matrix m2(2, 2);
+    m2(0, 0) = 4.0; m2(0, 1) = 3.0;
+    m2(1, 0) = 2.0; m2(1, 1) = 1.0;
 
-    Matrix m3 = m1 * m2;
+    Matrix expected(2, 2);
+    expected(0, 0) = 8.0;  expected(0, 1) = 5.0;
+    expected(1, 0) = 20.0; expected(1, 1) = 13.0;
 
-    EXPECT_DOUBLE_EQ(m3(0, 0), 8.0);
-    EXPECT_DOUBLE_EQ(m3(0, 1), 5.0);
-    EXPECT_DOUBLE_EQ(m3(1, 0), 20.0);
-    EXPECT_DOUBLE_EQ(m3(1, 1), 13.0);
+    EXPECT_EQ(m1 * m2, expected);
 }
 
 TEST(MatrixTest, ScalarMultiplication) {
     Matrix m(2, 2);
-    m(0, 0) = 1.0;
-    m(0, 1) = 2.0;
-    m(1, 0) = 1.0;
-    m(1, 1) = 2.0;
+    m(0, 0) = 1.0; m(0, 1) = 2.0;
+    m(1, 0) = 1.0; m(1, 1) = 2.0;
 
-    Matrix m2 = m * 5;
+    Matrix expected(2, 2);
+    expected(0, 0) = 5.0; expected(0, 1) = 10.0;
+    expected(1, 0) = 5.0; expected(1, 1) = 10.0;
 
-    EXPECT_DOUBLE_EQ(m2(0, 0), 5.0);
-    EXPECT_DOUBLE_EQ(m2(0, 1), 10.0);
-    EXPECT_DOUBLE_EQ(m2(1, 0), 5.0);
-    EXPECT_DOUBLE_EQ(m2(1, 1), 10.0);
+    EXPECT_EQ(m * 5.0, expected);
+}
+
+TEST(MatrixTest, Transpose) {
+    Matrix m(2, 2);
+    m(0, 0) = 1.0; m(0, 1) = 2.0;
+    m(1, 0) = 3.0; m(1, 1) = 4.0;
+
+    Matrix expected(2, 2);
+    expected(0, 0) = 1.0; expected(0, 1) = 3.0;
+    expected(1, 0) = 2.0; expected(1, 1) = 4.0;
+
+    EXPECT_EQ(m.transpose(), expected);
+}
+
+TEST(MatrixTest, Hadamard) {
+    Matrix m(2, 2);
+    m(0, 0) = 1.0; m(0, 1) = 2.0;
+    m(1, 0) = 3.0; m(1, 1) = 4.0;
+
+    Matrix m2(2, 2);
+    m2(0, 0) = 2.0; m2(0, 1) = 2.0;
+    m2(1, 0) = 2.0; m2(1, 1) = 2.0;
+
+    // Sprytne wykorzystanie wcześniej przetestowanego mnożenia skalarnego do wygenerowania oczekiwanego wyniku!
+    Matrix expected = m * 2.0;
+
+    EXPECT_EQ(m.hadamard(m2), expected);
+}
+
+// --- NOWY TEST: Sprawdzanie czy nasz kod dobrze reaguje na błędy ---
+TEST(MatrixTest, ThrowsOnInvalidDimensions) {
+    Matrix m1(2, 3);
+    Matrix m2(4, 5);
+
+    // EXPECT_THROW sprawdza, czy po wykonaniu (m1 + m2) wyleci wyjatek typu std::invalid_argument
+    EXPECT_THROW(m1 + m2, std::invalid_argument);
+    EXPECT_THROW(m1 - m2, std::invalid_argument);
+    EXPECT_THROW(m1 * m2, std::invalid_argument); // Mnożenie 2x3 przez 4x5 jest nielegalne
+    EXPECT_THROW(m1.hadamard(m2), std::invalid_argument);
 }
